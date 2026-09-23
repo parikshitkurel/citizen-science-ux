@@ -11,6 +11,8 @@ class Observation {
   final String odour;
   final String surfaceMovement;
   final String visibleLitter;
+  final String surroundingVegetation;
+  final String surroundingEnvironment;
   final String notes;
   final bool isDemo;
   final DateTime createdAt;
@@ -26,6 +28,8 @@ class Observation {
     required this.odour,
     required this.surfaceMovement,
     required this.visibleLitter,
+    this.surroundingVegetation = 'Unsure / Cannot tell',
+    this.surroundingEnvironment = 'Unsure / Cannot tell',
     required this.notes,
     this.isDemo = false,
     required this.createdAt,
@@ -55,6 +59,8 @@ class Observation {
       'odour': odour,
       'surfaceMovement': surfaceMovement,
       'visibleLitter': visibleLitter,
+      'surroundingVegetation': surroundingVegetation,
+      'surroundingEnvironment': surroundingEnvironment,
       'notes': notes,
       'isDemo': isDemo,
       'createdAt': createdAt.toIso8601String(),
@@ -73,6 +79,10 @@ class Observation {
       odour: json['odour'] as String,
       surfaceMovement: json['surfaceMovement'] as String,
       visibleLitter: json['visibleLitter'] as String,
+      surroundingVegetation:
+          (json['surroundingVegetation'] as String?) ?? 'Unsure / Cannot tell',
+      surroundingEnvironment:
+          (json['surroundingEnvironment'] as String?) ?? 'Unsure / Cannot tell',
       notes: (json['notes'] as String?) ?? '',
       isDemo: (json['isDemo'] as bool?) ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -90,6 +100,8 @@ class Observation {
     String? odour,
     String? surfaceMovement,
     String? visibleLitter,
+    String? surroundingVegetation,
+    String? surroundingEnvironment,
     String? notes,
     bool? isDemo,
     DateTime? createdAt,
@@ -105,6 +117,10 @@ class Observation {
       odour: odour ?? this.odour,
       surfaceMovement: surfaceMovement ?? this.surfaceMovement,
       visibleLitter: visibleLitter ?? this.visibleLitter,
+      surroundingVegetation:
+          surroundingVegetation ?? this.surroundingVegetation,
+      surroundingEnvironment:
+          surroundingEnvironment ?? this.surroundingEnvironment,
       notes: notes ?? this.notes,
       isDemo: isDemo ?? this.isDemo,
       createdAt: createdAt ?? this.createdAt,

@@ -117,12 +117,15 @@ class ObservationTile extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      StatusBadge.waterBody(observation.waterBodyType),
-                      const SizedBox(width: 6),
-                      StatusBadge.clarity(observation.clarity),
-                    ],
+                  Expanded(
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: [
+                        StatusBadge.waterBody(observation.waterBodyType),
+                        StatusBadge.clarity(observation.clarity),
+                      ],
+                    ),
                   ),
                   Text(
                     observation.formattedDate,
@@ -142,19 +145,19 @@ class ObservationTile extends StatelessWidget {
   }
 
   static IconData _getWaterIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'river':
-        return Icons.waves;
-      case 'stream':
-        return Icons.water_outlined;
-      case 'pond':
-        return Icons.pool;
-      case 'lake':
-        return Icons.landscape;
-      case 'canal':
-        return Icons.alt_route;
-      default:
-        return Icons.water;
+    final lower = type.toLowerCase();
+    if (lower.contains('river')) {
+      return Icons.waves;
+    } else if (lower.contains('stream')) {
+      return Icons.water_outlined;
+    } else if (lower.contains('pond')) {
+      return Icons.pool;
+    } else if (lower.contains('lake')) {
+      return Icons.landscape;
+    } else if (lower.contains('canal')) {
+      return Icons.alt_route;
+    } else {
+      return Icons.water;
     }
   }
 }

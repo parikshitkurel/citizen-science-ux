@@ -24,13 +24,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  Future<void> _confirmDelete(BuildContext context, Observation observation) async {
+  Future<void> _confirmDelete(Observation observation) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('Delete Observation?'),
         content: Text(
-          'Are you sure you want to delete "${observation.title}"? This action cannot be undone.',
+          'Are you sure you want to delete "${observation.title}"? This observation will be permanently removed from local storage.',
         ),
         actions: [
           TextButton(
@@ -54,7 +55,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Observation "${observation.title}" deleted.'),
+          content: Text('Observation "${observation.title}" removed.'),
           backgroundColor: AppColors.primaryNavy,
         ),
       );
@@ -79,17 +80,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           );
         },
-        icon: const Icon(Icons.add),
-        label: const Text('New Observation'),
+        icon: const Icon(Icons.add_circle_outline),
+        label: const Text('Start Assessment'),
       ),
       body: ValueListenableBuilder<List<Observation>>(
         valueListenable: ObservationRepository.instance.observationsNotifier,
         builder: (context, observations, _) {
-          // Apply search & water body filtering
+          // Filter observations based on search & water body category
           final query = _searchController.text.toLowerCase().trim();
           final filtered = observations.where((obs) {
             final matchesSearch = obs.title.toLowerCase().contains(query) ||
-                obs.location.toLowerCase().contains(query);
+                obs.location.toLowerCase().contains(query) ||
+                obs.notes.toLowerCase().contains(query);
             final matchesFilter = _selectedFilter == 'All' ||
                 obs.waterBodyType.toLowerCase() ==
                     _selectedFilter.toLowerCase();
@@ -101,14 +103,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
               children: [
                 // Search Bar & Filter Chips
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
                   child: Column(
                     children: [
                       TextField(
                         controller: _searchController,
                         onChanged: (_) => setState(() {}),
                         decoration: InputDecoration(
-                          hintText: 'Search by title or location...',
+                          hintText: 'Search observations by title or location...',
                           prefixIcon: const Icon(Icons.search,
                               color: AppColors.primaryTeal),
                           suffixIcon: _searchController.text.isNotEmpty
@@ -159,12 +161,43 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
 
+                // Count summary bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '${filtered.length} of ${observations.length} observations',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Offline Records',
+                        style: TextStyle(
+                          color: AppColors.primaryTeal,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 // Observations List or Empty State
                 Expanded(
                   child: filtered.isEmpty
                       ? _buildEmptyState(observations.isEmpty)
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          padding: const EdgeInsets.fromLTRB(20.0, 8.0, 20.0, 80.0),
                           itemCount: filtered.length,
                           itemBuilder: (context, index) {
                             final obs = filtered[index];
@@ -179,7 +212,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                 );
                               },
-                              onDelete: () => _confirmDelete(context, obs),
+                              onDelete: () => _confirmDelete(obs),
                             );
                           },
                         ),
@@ -225,8 +258,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
             const SizedBox(height: 8),
             Text(
               isTotalEmpty
-                  ? 'Tap "+ New Observation" to record your first stream or water-body check.'
-                  : 'Try clearing your search query or switching filters.',
+                  ? 'Tap "Start Assessment" below to record your first stream or water-body observation.'
+                  : 'Try changing your search query or choosing another water-body filter.',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.textMuted,

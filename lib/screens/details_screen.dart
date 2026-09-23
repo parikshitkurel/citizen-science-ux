@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/observation.dart';
 import '../repositories/observation_repository.dart';
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/status_badge.dart';
 import 'observation_form_screen.dart';
@@ -24,16 +25,19 @@ Date & Time: ${observation.formattedCreatedAt}
 💧 Water Appearance:
 - Clarity: ${observation.clarity}
 - Colour: ${observation.visibleColour}
-
-🌿 Environmental Conditions:
 - Odour: ${observation.odour}
+
+🌿 Environmental Factors:
 - Surface Movement: ${observation.surfaceMovement}
 - Visible Litter: ${observation.visibleLitter}
+- Surrounding Vegetation: ${observation.surroundingVegetation}
+- Surrounding Area: ${observation.surroundingEnvironment}
 
-📝 Notes:
+📝 Field Notes:
 ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
 
-* Recorded via AquaVerify Citizen Science UX App.
+ℹ️ Transparency Disclaimer:
+${AppConstants.observationDisclaimer}
 ''';
 
     Clipboard.setData(ClipboardData(text: summaryText));
@@ -49,6 +53,7 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: const Text('Delete Observation?'),
         content: Text(
           'Are you sure you want to delete "${observation.title}"? This cannot be undone.',
@@ -108,24 +113,24 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
                   children: [
                     // Header Banner Card
                     _buildHeaderBanner(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-                    // Non-scientific verification tag
+                    // Citizen science tag & non-lab disclaimer
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColors.lightTealSurface,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.primaryTeal.withOpacity(0.3)),
                       ),
                       child: Row(
                         children: const [
                           Icon(Icons.verified_outlined,
-                              color: AppColors.darkTeal, size: 16),
+                              color: AppColors.darkTeal, size: 18),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Citizen Science Record • Saved Locally',
+                              'Citizen Science Record • Visual Estimate (Not Certified Laboratory Data)',
                               style: TextStyle(
                                 color: AppColors.darkTeal,
                                 fontWeight: FontWeight.w600,
@@ -136,7 +141,7 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Section 1: Water Appearance Details
                     _buildDetailCard(
@@ -146,6 +151,7 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
                         _buildDetailItem('Clarity', observation.clarity,
                             widgetValue: StatusBadge.clarity(observation.clarity)),
                         _buildDetailItem('Visible Colour', observation.visibleColour),
+                        _buildDetailItem('Water Odour', observation.odour),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -155,39 +161,49 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
                       title: 'Environmental Factors',
                       icon: Icons.eco_outlined,
                       items: [
-                        _buildDetailItem('Water Odour', observation.odour),
                         _buildDetailItem(
                             'Surface Movement', observation.surfaceMovement),
-                        _buildDetailItem('Visible Litter', observation.visibleLitter),
+                        _buildDetailItem('Visible Litter', observation.visibleLitter,
+                            widgetValue: StatusBadge.litter(observation.visibleLitter)),
+                        _buildDetailItem('Surrounding Vegetation',
+                            observation.surroundingVegetation),
+                        _buildDetailItem('Surrounding Area',
+                            observation.surroundingEnvironment),
                       ],
                     ),
                     const SizedBox(height: 16),
 
                     // Section 3: Notes
-                    if (observation.notes.isNotEmpty)
-                      _buildDetailCard(
-                        title: 'Field Notes',
-                        icon: Icons.notes_outlined,
-                        items: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: Text(
-                              observation.notes,
-                              style: const TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 14,
-                                height: 1.5,
-                              ),
+                    _buildDetailCard(
+                      title: 'Field Notes',
+                      icon: Icons.notes_outlined,
+                      items: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            observation.notes.isNotEmpty
+                                ? observation.notes
+                                : 'No additional field notes entered for this observation.',
+                            style: TextStyle(
+                              color: observation.notes.isNotEmpty
+                                  ? AppColors.textPrimary
+                                  : AppColors.textMuted,
+                              fontStyle: observation.notes.isNotEmpty
+                                  ? FontStyle.normal
+                                  : FontStyle.italic,
+                              fontSize: 14,
+                              height: 1.5,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
 
-            // Bottom CTA bar ("Observe Again" repeat engagement feature)
+            // Bottom CTA bar ("Make Another Observation")
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: const BoxDecoration(
@@ -197,7 +213,7 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
                 ),
               ),
               child: CustomButton(
-                text: 'Make Another Observation',
+                text: 'Start New Assessment',
                 icon: Icons.add_circle_outline,
                 type: CustomButtonType.primary,
                 onPressed: () {
@@ -329,13 +345,17 @@ ${observation.notes.isNotEmpty ? observation.notes : 'None provided.'}
             label,
             style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
+          const SizedBox(width: 8),
           widgetValue ??
-              Text(
-                value,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              Flexible(
+                child: Text(
+                  value,
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
                 ),
               ),
         ],

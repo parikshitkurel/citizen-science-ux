@@ -40,12 +40,18 @@ class FormStepIndicator extends StatelessWidget {
                   fontSize: 13,
                 ),
               ),
-              Text(
-                currentTitle,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  currentTitle,
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ],
