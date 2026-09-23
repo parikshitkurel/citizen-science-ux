@@ -41,11 +41,12 @@ The application functions completely without requiring any backend, cloud login,
 * **Direct CTAs**: Primary *"Get Started"* → Dashboard, Secondary *"View My Observations"* → Observation History.
 * **No Authentication Barrier**: Immediate access without mandatory signup or data collection.
 
-### 2. Workspace Dashboard
-* **Live Local Statistics**: Displays total saved observations and user-submitted entries stored on-device.
-* **Primary Actions**: Prominent *"Start New Assessment"* and *"View Observation History"*.
-* **Citizen Science Education**: Built-in explanation card clarifying the purpose of community water monitoring.
-* **Helpful Empty States**: Inspiring prompts when zero observations are recorded.
+### 2. Workspace Dashboard & Demo Transparency
+* **Separated Live Statistics**: Distinct metric cards for *My Observations* (actual user submissions) vs. *Demo Samples* (seeded records for presentations).
+* **Primary Actions**: Prominent *"Start New Assessment"* as primary action and *"View History"*.
+* **Data Management Options**: Clear overflow actions to *"Restore Demo Data"*, *"Hide Demo Samples"*, or *"Clear All Data"* with explicit impact explanations.
+* **Citizen Science Education**: Built-in educational card highlighting the role of community monitoring.
+* **Accurate Empty States**: Dedicated guidance when no user observations exist yet.
 
 ### 3. Step 1 — Basic Location & Water Body
 * **Predefined Demonstration Locations**: 1-tap quick selection for demo streams, rivers, canals, and lakes (*Willow Creek Bridge*, *Riverside Urban Canal*, *Community Mill Pond*, *Highland Reservoir Park*, *Greenway Stream Overlook*, *Centennial Lake Boardwalk*).
@@ -79,8 +80,9 @@ The application functions completely without requiring any backend, cloud login,
 * **Duplicate Prevention**: Debounced save action preventing multiple record creation.
 
 ### 8. Observation History & Detailed Report View
-* **Search & Filter**: Real-time title/location search and water body type filter chips.
-* **Observation Tiles**: Visual status badges for water body type and clarity.
+* **3-Way Scope Filtering**: Seamlessly toggle between *All Records*, *My Observations*, and *Demo Samples*.
+* **Search & Water Body Filter**: Real-time keyword search and water body type chips (*Stream*, *River*, *Pond*, *Lake*, *Urban canal*, *Other*).
+* **Observation Tiles**: Visual badges distinguishing *Demo Sample* vs. *Citizen Entry*, along with clarity and water body indicators.
 * **Comprehensive Detail Screen**: Complete readout of all 10+ indicators, formatted clipboard export, and safe deletion confirmation dialog.
 
 ---

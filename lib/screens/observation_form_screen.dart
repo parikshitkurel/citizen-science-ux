@@ -197,21 +197,26 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            FormStepIndicator(
-              currentStep: _currentStep,
-              totalSteps: _totalSteps,
-              stepTitles: stepTitles,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Column(
+              children: [
+                FormStepIndicator(
+                  currentStep: _currentStep,
+                  totalSteps: _totalSteps,
+                  stepTitles: stepTitles,
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20.0),
+                    child: _buildCurrentStepContent(),
+                  ),
+                ),
+                _buildBottomNavigation(),
+              ],
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
-                child: _buildCurrentStepContent(),
-              ),
-            ),
-            _buildBottomNavigation(),
-          ],
+          ),
         ),
       ),
     );

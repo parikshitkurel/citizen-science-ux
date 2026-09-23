@@ -39,6 +39,9 @@ class ObservationRepository {
   int get userSubmittedCount =>
       observations.where((obs) => !obs.isDemo).length;
 
+  int get demoCount =>
+      observations.where((obs) => obs.isDemo).length;
+
   Future<void> addObservation(Observation observation) async {
     final updatedList = [observation, ...observationsNotifier.value];
     observationsNotifier.value = updatedList;
@@ -55,6 +58,22 @@ class ObservationRepository {
   Future<void> clearAll() async {
     observationsNotifier.value = [];
     await _storageService.saveObservations([]);
+  }
+
+  Future<void> clearDemoData() async {
+    final userOnly =
+        observationsNotifier.value.where((obs) => !obs.isDemo).toList();
+    observationsNotifier.value = userOnly;
+    await _storageService.saveObservations(userOnly);
+  }
+
+  Future<void> restoreDemoData() async {
+    final userOnly =
+        observationsNotifier.value.where((obs) => !obs.isDemo).toList();
+    final demoData = SampleData.initialSampleObservations;
+    final merged = [...demoData, ...userOnly];
+    observationsNotifier.value = merged;
+    await _storageService.saveObservations(merged);
   }
 
   Future<void> resetToDemo() async {

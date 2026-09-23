@@ -104,15 +104,18 @@ To facilitate demonstrations, testing, and rapid entry, AquaVerify offers one-ta
 
 ## 7. Expected Impact & Evaluation
 
-* **Engagement & Retention**: Removing login barriers and simplifying forms reduces onboarding drop-off by an estimated 70%+.
-* **Scientific Quality**: Standardized choices and "Unsure" options eliminate forced invalid inputs, improving data consistency for research partners.
+* **Engagement & Accessibility**: Removing mandatory login barriers and breaking observations into intuitive, bite-sized steps lowers cognitive friction for first-time volunteers and student groups.
+* **Observational Quality**: Standardized visual categories and dedicated "Unsure" choices eliminate forced guessing, improving data consistency for research partners.
 * **Environmental Literacy**: Embedded explanations turn each observation into a micro-learning experience for students and community members.
-* **Field Reliability**: Zero cloud dependency ensures the tool never fails in low-connectivity riverbanks and wetlands.
+* **Field Reliability**: Zero cloud dependency ensures the tool remains fully operational in low-connectivity riverbanks, wetlands, and remote conservation areas.
 
 ---
 
-## 8. Version 2 Roadmap
-* **GPS Coordinate Tagging**: Automatic device GPS location resolution.
-* **Photo Attachment**: Integrated camera capture for photographic bank verification.
-* **Data Export**: Export observations to CSV and GeoJSON for watershed organizations.
+## 8. Version 2 Roadmap (Future Scope)
+
+The current MVP focuses strictly on core observational UX and local persistence. Future planned enhancements include:
+* **GPS Coordinate Tagging**: Automatic device GPS location resolution (currently simulated via quick demo locations or manual text entry).
+* **Photo Attachment**: Camera/gallery capture for visual bank evidence.
+* **Data Export**: Direct CSV and GeoJSON export for community watershed organizations (currently supported via clipboard summary export).
 * **OneAquaHealth Cloud Sync**: Optional background synchronization when internet connectivity is available.
+

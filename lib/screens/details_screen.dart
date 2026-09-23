@@ -21,6 +21,7 @@ Title: ${observation.title}
 Water Body: ${observation.waterBodyType}
 Location: ${observation.location}
 Date & Time: ${observation.formattedCreatedAt}
+Type: ${observation.isDemo ? 'Demo Sample' : 'Citizen Record'}
 
 💧 Water Appearance:
 - Clarity: ${observation.clarity}
@@ -50,13 +51,16 @@ ${AppConstants.observationDisclaimer}
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
+    final isDemo = observation.isDemo;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Delete Observation?'),
+        title: Text(isDemo ? 'Delete Demo Sample?' : 'Delete Observation?'),
         content: Text(
-          'Are you sure you want to delete "${observation.title}"? This cannot be undone.',
+          isDemo
+              ? 'Remove sample record "${observation.title}"? (You can restore demo samples anytime from the menu).'
+              : 'Are you sure you want to delete "${observation.title}"? This cannot be undone.',
         ),
         actions: [
           TextButton(
@@ -103,130 +107,141 @@ ${AppConstants.observationDisclaimer}
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header Banner Card
-                    _buildHeaderBanner(),
-                    const SizedBox(height: 16),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Header Banner Card
+                        _buildHeaderBanner(),
+                        const SizedBox(height: 16),
 
-                    // Citizen science tag & non-lab disclaimer
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightTealSurface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.primaryTeal.withOpacity(0.3)),
-                      ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.verified_outlined,
-                              color: AppColors.darkTeal, size: 18),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Citizen Science Record • Visual Estimate (Not Certified Laboratory Data)',
-                              style: TextStyle(
-                                color: AppColors.darkTeal,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12,
+                        // Citizen science tag & non-lab disclaimer
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightTealSurface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: AppColors.primaryTeal.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: const [
+                              Icon(Icons.verified_outlined,
+                                  color: AppColors.darkTeal, size: 18),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Citizen Science Record • Visual Estimate (Not Certified Laboratory Data)',
+                                  style: TextStyle(
+                                    color: AppColors.darkTeal,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Section 1: Water Appearance Details
+                        _buildDetailCard(
+                          title: 'Water Appearance',
+                          icon: Icons.water_drop_outlined,
+                          items: [
+                            _buildDetailItem('Clarity', observation.clarity,
+                                widgetValue:
+                                    StatusBadge.clarity(observation.clarity)),
+                            _buildDetailItem(
+                                'Visible Colour', observation.visibleColour),
+                            _buildDetailItem(
+                                'Water Odour', observation.odour),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Section 2: Environmental Factors
+                        _buildDetailCard(
+                          title: 'Environmental Factors',
+                          icon: Icons.eco_outlined,
+                          items: [
+                            _buildDetailItem('Surface Movement',
+                                observation.surfaceMovement),
+                            _buildDetailItem(
+                                'Visible Litter', observation.visibleLitter,
+                                widgetValue:
+                                    StatusBadge.litter(observation.visibleLitter)),
+                            _buildDetailItem('Surrounding Vegetation',
+                                observation.surroundingVegetation),
+                            _buildDetailItem('Surrounding Area',
+                                observation.surroundingEnvironment),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Section 3: Notes
+                        _buildDetailCard(
+                          title: 'Field Notes',
+                          icon: Icons.notes_outlined,
+                          items: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                observation.notes.isNotEmpty
+                                    ? observation.notes
+                                    : 'No additional field notes entered for this observation.',
+                                style: TextStyle(
+                                  color: observation.notes.isNotEmpty
+                                      ? AppColors.textPrimary
+                                      : AppColors.textMuted,
+                                  fontStyle: observation.notes.isNotEmpty
+                                      ? FontStyle.normal
+                                      : FontStyle.italic,
+                                  fontSize: 14,
+                                  height: 1.5,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Section 1: Water Appearance Details
-                    _buildDetailCard(
-                      title: 'Water Appearance',
-                      icon: Icons.water_drop_outlined,
-                      items: [
-                        _buildDetailItem('Clarity', observation.clarity,
-                            widgetValue: StatusBadge.clarity(observation.clarity)),
-                        _buildDetailItem('Visible Colour', observation.visibleColour),
-                        _buildDetailItem('Water Odour', observation.odour),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Section 2: Environmental Factors
-                    _buildDetailCard(
-                      title: 'Environmental Factors',
-                      icon: Icons.eco_outlined,
-                      items: [
-                        _buildDetailItem(
-                            'Surface Movement', observation.surfaceMovement),
-                        _buildDetailItem('Visible Litter', observation.visibleLitter,
-                            widgetValue: StatusBadge.litter(observation.visibleLitter)),
-                        _buildDetailItem('Surrounding Vegetation',
-                            observation.surroundingVegetation),
-                        _buildDetailItem('Surrounding Area',
-                            observation.surroundingEnvironment),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Section 3: Notes
-                    _buildDetailCard(
-                      title: 'Field Notes',
-                      icon: Icons.notes_outlined,
-                      items: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            observation.notes.isNotEmpty
-                                ? observation.notes
-                                : 'No additional field notes entered for this observation.',
-                            style: TextStyle(
-                              color: observation.notes.isNotEmpty
-                                  ? AppColors.textPrimary
-                                  : AppColors.textMuted,
-                              fontStyle: observation.notes.isNotEmpty
-                                  ? FontStyle.normal
-                                  : FontStyle.italic,
-                              fontSize: 14,
-                              height: 1.5,
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
 
-            // Bottom CTA bar ("Make Another Observation")
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(color: AppColors.border, width: 1),
-                ),
-              ),
-              child: CustomButton(
-                text: 'Start New Assessment',
-                icon: Icons.add_circle_outline,
-                type: CustomButtonType.primary,
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ObservationFormScreen(),
+                // Bottom CTA bar ("Make Another Observation")
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(
+                      top: BorderSide(color: AppColors.border, width: 1),
                     ),
-                  );
-                },
-              ),
+                  ),
+                  child: CustomButton(
+                    text: 'Start New Assessment',
+                    icon: Icons.add_circle_outline,
+                    type: CustomButtonType.primary,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ObservationFormScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -246,10 +261,11 @@ ${AppConstants.observationDisclaimer}
           Row(
             children: [
               StatusBadge.waterBody(observation.waterBodyType),
-              if (observation.isDemo) ...[
-                const SizedBox(width: 8),
-                StatusBadge.demo(),
-              ],
+              const SizedBox(width: 8),
+              if (observation.isDemo)
+                StatusBadge.demo()
+              else
+                StatusBadge.userRecorded(),
             ],
           ),
           const SizedBox(height: 12),
