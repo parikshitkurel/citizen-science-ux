@@ -22,9 +22,12 @@ class HomeScreen extends StatelessWidget {
           children: const [
             Icon(Icons.water_drop, color: AppColors.primaryTeal, size: 22),
             SizedBox(width: 8),
-            Text(
-              AppConstants.appName,
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Flexible(
+              child: Text(
+                AppConstants.appName,
+                style: TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

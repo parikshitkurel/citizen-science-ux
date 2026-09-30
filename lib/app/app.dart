@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../models/observation.dart';
 import '../repositories/observation_repository.dart';
 import '../screens/details_screen.dart';
 import '../screens/history_screen.dart';
@@ -31,15 +31,20 @@ class _AquaVerifyAppState extends State<AquaVerifyApp> {
   }
 
   Widget _getHomeScreen() {
-    String? screen = widget.initialScreen ?? Uri.base.queryParameters['screen'];
-    if (screen == null && Uri.base.fragment.isNotEmpty) {
-      final fragment = Uri.base.fragment;
-      final fragUri = Uri.tryParse('http://localhost/$fragment');
-      screen = fragUri?.queryParameters['screen'];
-      if (screen == null) {
-        final clean = fragment.replaceAll('/', '').replaceAll('#', '').trim();
-        if (clean.isNotEmpty) screen = clean;
-      }
+    String? screen = widget.initialScreen;
+    if (screen == null && kIsWeb) {
+      try {
+        screen = Uri.base.queryParameters['screen'];
+        if (screen == null && Uri.base.fragment.isNotEmpty) {
+          final fragment = Uri.base.fragment;
+          final fragUri = Uri.tryParse('http://localhost/$fragment');
+          screen = fragUri?.queryParameters['screen'];
+          if (screen == null) {
+            final clean = fragment.replaceAll('/', '').replaceAll('#', '').trim();
+            if (clean.isNotEmpty) screen = clean;
+          }
+        }
+      } catch (_) {}
     }
     final sampleObs = SampleData.initialSampleObservations.first;
 
@@ -75,7 +80,6 @@ class _AquaVerifyAppState extends State<AquaVerifyApp> {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routes: {
-        '/': (context) => const WelcomeScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/home': (context) => const HomeScreen(),
         '/step1': (context) => const ObservationFormScreen(initialStep: 1),
