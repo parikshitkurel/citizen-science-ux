@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 
+/// Progressive disclosure widget for educational explanations.
+/// Defaults to COLLAPSED so the question and answer choices remain
+/// the dominant visual element (Selective Attention, Hick's Law).
+/// Users tap to expand if they want context (Tesler's Law —
+/// complexity absorbed by the interface, not the user).
 class InfoTooltipCard extends StatefulWidget {
   final String title;
   final String description;
@@ -17,16 +22,16 @@ class InfoTooltipCard extends StatefulWidget {
   State<InfoTooltipCard> createState() => _InfoTooltipCardState();
 }
 
-class _InfoTooltipCardState extends State<InfoTooltipCard> {
-  bool _isExpanded = true;
+class _InfoTooltipCardState extends State<InfoTooltipCard>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.lightTealSurface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primaryTeal.withOpacity(0.3)),
+        color: AppColors.lightTealSurface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         children: [
@@ -36,19 +41,23 @@ class _InfoTooltipCardState extends State<InfoTooltipCard> {
                 _isExpanded = !_isExpanded;
               });
             },
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               child: Row(
                 children: [
-                  Icon(widget.icon, color: AppColors.darkTeal, size: 20),
+                  Icon(
+                    Icons.lightbulb_outline,
+                    color: AppColors.darkTeal,
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      widget.title,
+                      _isExpanded ? widget.title : 'Why we ask this',
                       style: const TextStyle(
                         color: AppColors.darkTeal,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         fontSize: 13,
                       ),
                     ),
@@ -58,15 +67,16 @@ class _InfoTooltipCardState extends State<InfoTooltipCard> {
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     color: AppColors.darkTeal,
-                    size: 20,
+                    size: 18,
                   ),
                 ],
               ),
             ),
           ),
-          if (_isExpanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 14, right: 14, bottom: 12),
+          AnimatedCrossFade(
+            firstChild: const SizedBox.shrink(),
+            secondChild: Padding(
+              padding: const EdgeInsets.only(left: 12, right: 12, bottom: 10),
               child: Text(
                 widget.description,
                 style: const TextStyle(
@@ -76,6 +86,11 @@ class _InfoTooltipCardState extends State<InfoTooltipCard> {
                 ),
               ),
             ),
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 200),
+          ),
         ],
       ),
     );

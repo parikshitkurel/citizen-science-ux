@@ -192,50 +192,45 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Workspace Banner Card with Transparent Stats
+                      // SECTION 1: Compact workspace header with stats
                       _buildWorkspaceHeader(userCount, demoCount, totalCount),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
 
-                      // Action Buttons (Start Assessment + View History)
-                      Column(
-                        children: [
-                          CustomButton(
-                            text: 'Start New Assessment',
-                            icon: Icons.add_circle_outline_rounded,
-                            type: CustomButtonType.primary,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ObservationFormScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 10),
-                          CustomButton(
-                            text: 'View Observation History',
-                            icon: Icons.history_rounded,
-                            type: CustomButtonType.outlined,
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HistoryScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                      // SECTION 2: PRIMARY CTA — Start New Assessment
+                      // (Von Restorff: visually dominant, Selective Attention: one primary action)
+                      CustomButton(
+                        text: 'Start New Assessment',
+                        icon: Icons.add_circle_outline_rounded,
+                        type: CustomButtonType.primary,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const ObservationFormScreen(),
+                            ),
+                          );
+                        },
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
 
-                      // Citizen Science Educational Explanation Card
-                      _buildCitizenScienceCard(),
-                      const SizedBox(height: 20),
+                      // SECONDARY CTA — View History
+                      CustomButton(
+                        text: 'View Observation History',
+                        icon: Icons.history_rounded,
+                        type: CustomButtonType.outlined,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HistoryScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 28),
 
-                      // Recent Observations Header
+                      // SECTION 3: Recent Observations — supporting content
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -248,8 +243,8 @@ class HomeScreen extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 color: AppColors.textPrimary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
@@ -272,6 +267,7 @@ class HomeScreen extends StatelessWidget {
                                     style: TextStyle(
                                       color: AppColors.primaryTeal,
                                       fontWeight: FontWeight.w600,
+                                      fontSize: 13,
                                     ),
                                   ),
                                   SizedBox(width: 4),
@@ -285,31 +281,23 @@ class HomeScreen extends StatelessWidget {
                             ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
 
-                      // Recent Observations List or Empty State
+                      // Demo sample indicator (when no user observations)
                       if (recentObservations.isEmpty)
                         _buildEmptyState(context)
                       else ...[
                         if (userCount == 0 && demoCount > 0)
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: AppColors.lightBlueSurface,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                  color: AppColors.info.withOpacity(0.3)),
-                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
                             child: Row(
-                              children: const [
+                              children: [
                                 Icon(Icons.info_outline,
-                                    size: 16, color: AppColors.info),
-                                SizedBox(width: 8),
+                                    size: 14, color: AppColors.info),
+                                const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
-                                    'Showing demo samples. Tap "Start New Assessment" to record your own observation.',
+                                    'Showing demo samples. Start an assessment to record your own.',
                                     style: TextStyle(
                                       color: AppColors.info,
                                       fontSize: 12,
@@ -337,6 +325,12 @@ class HomeScreen extends StatelessWidget {
                           }).toList(),
                         ),
                       ],
+
+                      const SizedBox(height: 20),
+
+                      // SECTION 4: Citizen Science — TERTIARY, visually receding
+                      // (Moved below recent observations so it doesn't compete with primary CTA)
+                      _buildCitizenScienceCard(),
                     ],
                   ),
                 ),
@@ -348,24 +342,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Compact workspace header.
+  /// Stats use simple inline text instead of large card-within-card.
+  /// (Law of Common Region: one container for all workspace info)
   Widget _buildWorkspaceHeader(
       int userCount, int demoCount, int totalCount) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [AppColors.primaryNavy, Color(0xFF244A6F)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryNavy.withOpacity(0.15),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,85 +365,51 @@ class HomeScreen extends StatelessWidget {
             children: [
               const Flexible(
                 child: Text(
-                  'Welcome Back 👋',
+                  'Freshwater Observation Workspace',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: AppColors.lightTealSurface,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  '100% Offline Storage',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.wifi_off, size: 12, color: Colors.white70),
+                    SizedBox(width: 4),
+                    Text(
+                      'Offline',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Freshwater Observation Workspace',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const Divider(color: Colors.white24, height: 1),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          // Inline stats row — compact, no card nesting
           Row(
             children: [
-              Expanded(
-                child: _buildStatItem(
-                  label: 'My Observations',
-                  value: '$userCount',
-                  icon: Icons.person_pin_outlined,
-                  highlight: true,
-                ),
-              ),
-              Container(
-                height: 32,
-                width: 1,
-                color: Colors.white24,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              Expanded(
-                child: _buildStatItem(
-                  label: 'Demo Samples',
-                  value: '$demoCount',
-                  icon: Icons.science_outlined,
-                  highlight: false,
-                ),
-              ),
-              Container(
-                height: 32,
-                width: 1,
-                color: Colors.white24,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              Expanded(
-                child: _buildStatItem(
-                  label: 'Total Records',
-                  value: '$totalCount',
-                  icon: Icons.analytics_outlined,
-                  highlight: false,
-                ),
-              ),
+              _buildStatChip('$userCount', 'My Records'),
+              const SizedBox(width: 16),
+              _buildStatChip('$demoCount', 'Demo'),
+              const SizedBox(width: 16),
+              _buildStatChip('$totalCount', 'Total'),
             ],
           ),
         ],
@@ -461,56 +417,38 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem({
-    required String label,
-    required String value,
-    required IconData icon,
-    bool highlight = false,
-  }) {
+  Widget _buildStatChip(String value, String label) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          color: highlight ? AppColors.lightTealSurface : Colors.white70,
-          size: 20,
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.lightTealSurface,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
         ),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: highlight ? AppColors.lightTealSurface : Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.75),
-                  fontSize: 11,
-                ),
-              ),
-            ],
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.6),
+            fontSize: 12,
           ),
         ),
       ],
     );
   }
 
+  /// Citizen Science explanation — moved to TERTIARY position.
+  /// Uses progressive disclosure: compact by default.
   Widget _buildCitizenScienceCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -518,32 +456,25 @@ class HomeScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.lightTealSurface,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.eco_outlined,
-                  color: AppColors.primaryTeal,
-                  size: 20,
-                ),
+              Icon(
+                Icons.eco_outlined,
+                color: AppColors.primaryTeal,
+                size: 18,
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               const Expanded(
                 child: Text(
                   'What is Citizen Science?',
                   style: TextStyle(
                     color: AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           const Text(
             'Citizen science invites community members and students to contribute to environmental monitoring. By recording visual indicators like clarity, colour, and vegetation, you help build baseline knowledge of local waterways.',
             style: TextStyle(
@@ -552,30 +483,22 @@ class HomeScreen extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 10),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.inputBackground,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: const [
-                Icon(Icons.info_outline, size: 14, color: AppColors.primaryTeal),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Observations are visual estimates, not certified laboratory tests.',
-                    style: TextStyle(
-                      color: AppColors.textMuted,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                    ),
+          const SizedBox(height: 8),
+          Row(
+            children: const [
+              Icon(Icons.info_outline, size: 13, color: AppColors.textMuted),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Observations are visual estimates, not certified laboratory tests.',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -588,42 +511,42 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(14),
             decoration: const BoxDecoration(
               color: AppColors.lightTealSurface,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.water_drop_outlined,
-              size: 40,
+              size: 36,
               color: AppColors.primaryTeal,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           const Text(
-            'No observations yet.',
+            'No observations yet',
             style: TextStyle(
               color: AppColors.textPrimary,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           const Text(
             'Start your first freshwater assessment.',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: AppColors.textMuted,
-              fontSize: 14,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           SizedBox(
             width: 220,
             child: CustomButton(

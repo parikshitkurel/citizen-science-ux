@@ -112,7 +112,12 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
     // Auto generate title if user left it blank
     String title = _titleController.text.trim();
     if (title.isEmpty) {
-      title = '$_waterBodyType Observation';
+      final loc = _locationController.text.trim();
+      if (loc.isNotEmpty) {
+        title = '$loc Assessment';
+      } else {
+        title = '$_waterBodyType Observation';
+      }
     }
 
     final observation = Observation(
@@ -190,7 +195,7 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Guided Assessment Wizard'),
+        title: const Text('New Assessment'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: _prevStep,
@@ -244,24 +249,25 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Dominant question (Selective Attention)
           const Text(
             'Where are you observing?',
             style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 20,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           const Text(
-            'Select or enter the location name and type of freshwater body.',
+            'Select the type of water body and enter the location.',
             style: TextStyle(color: AppColors.textMuted, fontSize: 14),
           ),
           const SizedBox(height: 20),
 
           // Water body type selection
           const Text(
-            'Water Body Type *',
+            'Water Body Type',
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 8),
@@ -292,47 +298,43 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
-          // Predefined Demonstration Locations
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Flexible(
-                child: Text(
-                  'Quick Demo Locations',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: AppColors.textMuted,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Tap to fill',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.primaryTeal,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          // Location Name field — REQUIRED, prominent
+          const Text(
+            'Location Name / Landmark',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            controller: _locationController,
+            decoration: const InputDecoration(
+              hintText: 'e.g., Willow Creek Bridge',
+              prefixIcon:
+                  Icon(Icons.location_on_outlined, color: AppColors.primaryTeal),
+            ),
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter or select a location name';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 8),
+
+          // Quick demo locations — compact, secondary
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: AppConstants.predefinedLocations.map((loc) {
                 return Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
+                  padding: const EdgeInsets.only(right: 6.0),
                   child: ActionChip(
                     avatar: const Icon(Icons.place, size: 14, color: AppColors.primaryTeal),
                     label: Text(loc, style: const TextStyle(fontSize: 12)),
                     backgroundColor: Colors.white,
                     side: const BorderSide(color: AppColors.border),
+                    visualDensity: VisualDensity.compact,
                     onPressed: () {
                       setState(() {
                         _locationController.text = loc;
@@ -346,48 +348,31 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // Location Name field
+          // Title field — clearly marked optional, visually receding
           const Text(
-            'Location Name / Landmark *',
+            'Observation Title',
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
-          const SizedBox(height: 6),
-          TextFormField(
-            controller: _locationController,
-            decoration: const InputDecoration(
-              hintText: 'e.g., Willow Creek Bridge, Riverside Canal',
-              prefixIcon:
-                  Icon(Icons.location_on_outlined, color: AppColors.primaryTeal),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter or select a location name';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
-
-          // Title field (Optional / Auto-generated)
+          const SizedBox(height: 2),
           const Text(
-            'Observation Title (Optional)',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            'Optional — auto-generated if left blank',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
           const SizedBox(height: 6),
           TextFormField(
             controller: _titleController,
             decoration: const InputDecoration(
-              hintText: 'e.g., Afternoon River Check (defaults if blank)',
+              hintText: 'e.g., Afternoon River Check',
               prefixIcon: Icon(Icons.title, color: AppColors.primaryTeal),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // Date & Time Picker field
           const Text(
-            'Observation Date & Time (Auto-generated)',
+            'Date & Time',
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 6),
@@ -408,7 +393,7 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      DateFormat('EEEE, MMM dd, yyyy • hh:mm a')
+                      DateFormat('EEE, MMM dd, yyyy • hh:mm a')
                           .format(_observationDate),
                       style: const TextStyle(
                         color: AppColors.textPrimary,
@@ -425,29 +410,21 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Location note
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.lightTealSurface.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: const [
-                Icon(Icons.gps_fixed, size: 16, color: AppColors.darkTeal),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Location model is structured for direct GPS integration in future releases.',
-                    style: TextStyle(
-                      color: AppColors.darkTeal,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
+          // Future GPS capability — subtle, does not compete
+          Row(
+            children: [
+              Icon(Icons.gps_fixed, size: 14, color: AppColors.textMuted),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'GPS location tagging — coming in a future release.',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -455,86 +432,61 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
   }
 
   // --- STEP 2: WATER APPEARANCE ---
+  // Hierarchy per question: Question → Options → "Why we ask this" (collapsed)
+  // (Hick's Law: ONE dominant task per question group)
   Widget _buildStep2WaterAppearance() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Water Appearance',
+          'What does the water look like?',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         const Text(
-          'Observe visual clarity, colour, and odour from a safe position on the bank.',
+          'Observe from a safe position on the bank.',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
         // 1. Water Clarity
-        const Text(
-          'How clear does the water look?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'How clear does the water look?',
+          options: AppConstants.clarityOptions,
+          selectedValue: _clarity,
+          onChanged: (val) => setState(() => _clarity = val),
+          infoTitle: 'Why we ask this (Clarity)',
+          infoDescription: AppConstants.educationalExplanations['clarity']!,
+          infoIcon: Icons.water_drop_outlined,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Clarity)',
-          description: AppConstants.educationalExplanations['clarity']!,
-          icon: Icons.water_drop_outlined,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.clarityOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _clarity == opt,
-            onTap: () => setState(() => _clarity = opt),
-          );
-        }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // 2. Visible Water Colour
-        const Text(
-          'What colour does the water appear to be?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'What colour does the water appear?',
+          options: AppConstants.colorOptions,
+          selectedValue: _visibleColour,
+          onChanged: (val) => setState(() => _visibleColour = val),
+          infoTitle: 'Why we ask this (Colour)',
+          infoDescription: AppConstants.educationalExplanations['color']!,
+          infoIcon: Icons.palette_outlined,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Colour)',
-          description: AppConstants.educationalExplanations['color']!,
-          icon: Icons.palette_outlined,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.colorOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _visibleColour == opt,
-            onTap: () => setState(() => _visibleColour = opt),
-          );
-        }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // 3. Water Odour
-        const Text(
-          'Do you notice any unusual smell?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'Do you notice any unusual smell?',
+          options: AppConstants.odourOptions,
+          selectedValue: _odour,
+          onChanged: (val) => setState(() => _odour = val),
+          infoTitle: 'Why we ask this (Odour & Safety)',
+          infoDescription: AppConstants.educationalExplanations['odour']!,
+          infoIcon: Icons.air,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Odour & Safety)',
-          description: AppConstants.educationalExplanations['odour']!,
-          icon: Icons.air,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.odourOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _odour == opt,
-            onTap: () => setState(() => _odour = opt),
-          );
-        }),
       ],
     );
   }
@@ -545,102 +497,66 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Environmental Factors',
+          'What is happening around the water?',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         const Text(
-          'Record surface flow, litter presence, vegetation, and surrounding land use.',
+          'Record flow, litter, vegetation, and surrounding land use.',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
 
         // 1. Surface Water Movement
-        const Text(
-          'How is the water moving?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'How is the water moving?',
+          options: AppConstants.movementOptions,
+          selectedValue: _surfaceMovement,
+          onChanged: (val) => setState(() => _surfaceMovement = val),
+          infoTitle: 'Why we ask this (Water Movement)',
+          infoDescription: AppConstants.educationalExplanations['movement']!,
+          infoIcon: Icons.waves,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Water Movement)',
-          description: AppConstants.educationalExplanations['movement']!,
-          icon: Icons.waves,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.movementOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _surfaceMovement == opt,
-            onTap: () => setState(() => _surfaceMovement = opt),
-          );
-        }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // 2. Visible Litter
-        const Text(
-          'How much visible litter or trash do you notice?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'How much visible litter or trash do you notice?',
+          options: AppConstants.litterOptions,
+          selectedValue: _visibleLitter,
+          onChanged: (val) => setState(() => _visibleLitter = val),
+          infoTitle: 'Why we ask this (Litter)',
+          infoDescription: AppConstants.educationalExplanations['litter']!,
+          infoIcon: Icons.delete_outline,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Litter)',
-          description: AppConstants.educationalExplanations['litter']!,
-          icon: Icons.delete_outline,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.litterOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _visibleLitter == opt,
-            onTap: () => setState(() => _visibleLitter = opt),
-          );
-        }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // 3. Surrounding Vegetation
-        const Text(
-          'What do you notice around the water (Vegetation)?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'How much vegetation is near the water?',
+          options: AppConstants.vegetationOptions,
+          selectedValue: _surroundingVegetation,
+          onChanged: (val) => setState(() => _surroundingVegetation = val),
+          infoTitle: 'Why we ask this (Vegetation)',
+          infoDescription: AppConstants.educationalExplanations['vegetation']!,
+          infoIcon: Icons.grass,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Vegetation)',
-          description: AppConstants.educationalExplanations['vegetation']!,
-          icon: Icons.grass,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.vegetationOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _surroundingVegetation == opt,
-            onTap: () => setState(() => _surroundingVegetation = opt),
-          );
-        }),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
         // 4. Surrounding Environment
-        const Text(
-          'What best describes the surrounding area?',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+        _buildQuestionGroup(
+          question: 'What best describes the surrounding area?',
+          options: AppConstants.surroundingEnvironmentOptions,
+          selectedValue: _surroundingEnvironment,
+          onChanged: (val) => setState(() => _surroundingEnvironment = val),
+          infoTitle: 'Why we ask this (Surrounding Area)',
+          infoDescription: AppConstants.educationalExplanations['environment']!,
+          infoIcon: Icons.location_city,
         ),
-        const SizedBox(height: 6),
-        InfoTooltipCard(
-          title: 'Why we ask this (Surrounding Area)',
-          description: AppConstants.educationalExplanations['environment']!,
-          icon: Icons.location_city,
-        ),
-        const SizedBox(height: 8),
-        ...AppConstants.surroundingEnvironmentOptions.map((opt) {
-          return _buildRadioCard(
-            title: opt,
-            isSelected: _surroundingEnvironment == opt,
-            onTap: () => setState(() => _surroundingEnvironment = opt),
-          );
-        }),
       ],
     );
   }
@@ -651,14 +567,14 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Field Notes & Summary',
+          'Anything else to record?',
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         const Text(
           'Add any extra field observations, wildlife sightings, or unusual conditions.',
           style: TextStyle(color: AppColors.textMuted, fontSize: 14),
@@ -667,8 +583,13 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
 
         // Notes Text Field
         const Text(
-          'Additional Field Notes (Optional)',
+          'Additional Field Notes',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+        const SizedBox(height: 2),
+        const Text(
+          'Optional — your observation is valid without notes',
+          style: TextStyle(color: AppColors.textMuted, fontSize: 12),
         ),
         const SizedBox(height: 6),
         TextFormField(
@@ -680,73 +601,40 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
             alignLabelWithHint: true,
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
-        // Photo / Attachment Placeholder
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.inputBackground,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.lightTealSurface,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.photo_camera_outlined,
-                  color: AppColors.primaryTeal,
-                  size: 24,
+        // Future capability — clearly informational, not interactive
+        Row(
+          children: [
+            Icon(Icons.photo_camera_outlined, size: 18, color: AppColors.textMuted),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Photo capture and GPS tagging — coming in a future release.',
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 13,
                 ),
               ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Photo & GPS Attachment',
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Photo capture and GPS metadata tagging are designed for future releases.',
-                      style: TextStyle(
-                        color: AppColors.textMuted,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
 
-        // Official Observation Disclaimer Banner
+        // Observation disclaimer
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.warningSurface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.warning.withOpacity(0.4)),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.warning.withOpacity(0.3)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Icon(Icons.shield_outlined,
-                  color: AppColors.warning, size: 20),
-              const SizedBox(width: 10),
+                  color: AppColors.warning, size: 18),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -755,11 +643,11 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
                       'Observation Disclaimer',
                       style: TextStyle(
                         color: AppColors.warning,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 3),
                     Text(
                       AppConstants.observationDisclaimer,
                       style: TextStyle(
@@ -778,16 +666,60 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
     );
   }
 
+  /// Reusable question group: Question → Options → Info (collapsed).
+  /// Consistent hierarchy across all questions (Law of Similarity).
+  /// Info card appears AFTER options (progressive disclosure).
+  Widget _buildQuestionGroup({
+    required String question,
+    required List<String> options,
+    required String selectedValue,
+    required ValueChanged<String> onChanged,
+    required String infoTitle,
+    required String infoDescription,
+    required IconData infoIcon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Question — visually dominant
+        Text(
+          question,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 10),
+        // Options — immediate, large touch targets (Fitts's Law)
+        ...options.map((opt) {
+          return _buildRadioCard(
+            title: opt,
+            isSelected: selectedValue == opt,
+            onTap: () => onChanged(opt),
+          );
+        }),
+        const SizedBox(height: 6),
+        // Educational info — collapsed by default (Hick's Law, progressive disclosure)
+        InfoTooltipCard(
+          title: infoTitle,
+          description: infoDescription,
+          icon: infoIcon,
+        ),
+      ],
+    );
+  }
+
   Widget _buildRadioCard({
     required String title,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: isSelected ? AppColors.lightTealSurface : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isSelected ? AppColors.primaryTeal : AppColors.border,
           width: isSelected ? 1.5 : 1.0,
@@ -795,9 +727,9 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           child: Row(
             children: [
               Icon(
@@ -850,6 +782,7 @@ class _ObservationFormScreenState extends State<ObservationFormScreen> {
             const SizedBox(width: 12),
           ],
           Expanded(
+            flex: _currentStep > 1 ? 2 : 1,
             child: CustomButton(
               text: _currentStep == _totalSteps ? 'Review Summary' : 'Next Step',
               icon: _currentStep == _totalSteps

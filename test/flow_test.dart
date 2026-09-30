@@ -38,10 +38,10 @@ void main() {
     // 3. Step 1: Location & Water Body
     expect(find.text('Where are you observing?'), findsOneWidget);
     expect(find.text('Stream'), findsWidgets);
-    expect(find.text('Willow Creek Bridge'), findsOneWidget);
+    expect(find.text('Willow Creek Bridge'), findsWidgets);
 
-    // Tap demo location quick chip
-    await tester.tap(find.text('Willow Creek Bridge'));
+    // Tap demo location quick chip (find.last targets the ActionChip, not the text field)
+    await tester.tap(find.text('Willow Creek Bridge').last);
     await tester.pumpAndSettle();
 
     // Tap "Next Step" -> Step 2
@@ -60,7 +60,7 @@ void main() {
 
     // 5. Step 3: Environmental Factors
     expect(find.text('How is the water moving?'), findsOneWidget);
-    expect(find.text('What do you notice around the water (Vegetation)?'), findsOneWidget);
+    expect(find.text('How much vegetation is near the water?'), findsOneWidget);
 
     // Tap "Next Step" -> Step 4
     await tester.ensureVisible(find.text('Next Step'));

@@ -22,28 +22,65 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
       ),
       textTheme: baseTextTheme.copyWith(
+        // Display — Page hero titles (Welcome, Dashboard)
         displayLarge: baseTextTheme.displayLarge?.copyWith(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.bold,
           fontSize: 32,
+          letterSpacing: -0.5,
+          height: 1.2,
         ),
+        // Headline — Screen titles, section headers
         headlineMedium: baseTextTheme.headlineMedium?.copyWith(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w700,
-          fontSize: 24,
+          fontSize: 22,
+          height: 1.3,
         ),
+        // Title Large — Step question titles (most prominent on assessment screens)
         titleLarge: baseTextTheme.titleLarge?.copyWith(
           color: AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
           fontSize: 18,
+          height: 1.3,
         ),
+        // Title Medium — Card section headers
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          height: 1.4,
+        ),
+        // Title Small — Field labels, sub-headings
+        titleSmall: baseTextTheme.titleSmall?.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+          height: 1.4,
+        ),
+        // Body Large — Primary body text
         bodyLarge: baseTextTheme.bodyLarge?.copyWith(
           color: AppColors.textPrimary,
           fontSize: 16,
+          height: 1.5,
         ),
+        // Body Medium — Secondary/supporting text
         bodyMedium: baseTextTheme.bodyMedium?.copyWith(
           color: AppColors.textMuted,
           fontSize: 14,
+          height: 1.5,
+        ),
+        // Body Small — Metadata, captions
+        bodySmall: baseTextTheme.bodySmall?.copyWith(
+          color: AppColors.textMuted,
+          fontSize: 12,
+          height: 1.4,
+        ),
+        // Label Large — Button text
+        labelLarge: baseTextTheme.labelLarge?.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+          fontSize: 15,
         ),
       ),
       appBarTheme: AppBarTheme(
@@ -54,7 +91,7 @@ class AppTheme {
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         titleTextStyle: GoogleFonts.inter(
           color: AppColors.textPrimary,
-          fontSize: 18,
+          fontSize: 17,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -62,7 +99,7 @@ class AppTheme {
         color: AppColors.cardBackground,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           side: const BorderSide(color: AppColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -72,12 +109,13 @@ class AppTheme {
           backgroundColor: AppColors.primaryTeal,
           foregroundColor: AppColors.textOnDark,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          minimumSize: const Size(0, 52),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           textStyle: GoogleFonts.inter(
-            fontSize: 16,
+            fontSize: 15,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -86,7 +124,8 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryNavy,
           side: const BorderSide(color: AppColors.primaryNavy, width: 1.5),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          minimumSize: const Size(0, 48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

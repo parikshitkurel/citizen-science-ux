@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 
+/// Multi-step progress indicator showing clear assessment progress.
+/// Applies Goal-Gradient Effect: users see exactly where they are
+/// and how close they are to completion.
 class FormStepIndicator extends StatelessWidget {
   final int currentStep; // 1 to totalSteps
   final int totalSteps;
@@ -15,11 +18,10 @@ class FormStepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = currentStep / totalSteps;
     final currentTitle = stepTitles[currentStep - 1];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
         border: const Border(
@@ -29,44 +31,62 @@ class FormStepIndicator extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Step counter + title row
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Step $currentStep of $totalSteps',
-                style: const TextStyle(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
                   color: AppColors.primaryTeal,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Step $currentStep of $totalSteps',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   currentTitle,
-                  textAlign: TextAlign.end,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                    fontSize: 14,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: AppColors.border,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.primaryTeal,
-              ),
-            ),
+          const SizedBox(height: 10),
+          // Segmented progress bar — each segment = one step
+          Row(
+            children: List.generate(totalSteps, (index) {
+              final stepNum = index + 1;
+              final isCompleted = stepNum < currentStep;
+              final isCurrent = stepNum == currentStep;
+
+              return Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(right: index < totalSteps - 1 ? 4 : 0),
+                  height: 5,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: isCompleted
+                        ? AppColors.primaryTeal
+                        : isCurrent
+                            ? AppColors.primaryTeal.withOpacity(0.5)
+                            : AppColors.border,
+                  ),
+                ),
+              );
+            }),
           ),
         ],
       ),

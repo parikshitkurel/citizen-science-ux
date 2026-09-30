@@ -29,32 +29,26 @@ class CustomButton extends StatelessWidget {
       children: [
         if (isLoading) ...[
           const SizedBox(
-            width: 16,
-            height: 16,
+            width: 18,
+            height: 18,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
         ] else if (icon != null) ...[
-          Icon(icon, size: 18),
-          const SizedBox(width: 6),
+          Icon(icon, size: 20),
+          const SizedBox(width: 8),
         ],
         Flexible(
           child: Text(
             text,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
           ),
         ),
       ],
-    );
-
-    final buttonStyle = ElevatedButton.styleFrom(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     );
 
     Widget button;
@@ -62,9 +56,16 @@ class CustomButton extends StatelessWidget {
       case CustomButtonType.primary:
         button = ElevatedButton(
           onPressed: isLoading ? null : onPressed,
-          style: buttonStyle.copyWith(
-            backgroundColor: const WidgetStatePropertyAll(AppColors.primaryTeal),
-            foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryTeal,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
           ),
           child: child,
         );
@@ -73,9 +74,16 @@ class CustomButton extends StatelessWidget {
       case CustomButtonType.secondary:
         button = ElevatedButton(
           onPressed: isLoading ? null : onPressed,
-          style: buttonStyle.copyWith(
-            backgroundColor: const WidgetStatePropertyAll(AppColors.primaryNavy),
-            foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryNavy,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
           ),
           child: child,
         );
@@ -85,10 +93,14 @@ class CustomButton extends StatelessWidget {
         button = OutlinedButton(
           onPressed: isLoading ? null : onPressed,
           style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            side: const BorderSide(color: AppColors.primaryNavy, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             foregroundColor: AppColors.primaryNavy,
+            side: const BorderSide(color: AppColors.primaryNavy, width: 1.5),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
           ),
           child: child,
         );
@@ -97,9 +109,16 @@ class CustomButton extends StatelessWidget {
       case CustomButtonType.danger:
         button = ElevatedButton(
           onPressed: isLoading ? null : onPressed,
-          style: buttonStyle.copyWith(
-            backgroundColor: const WidgetStatePropertyAll(AppColors.danger),
-            foregroundColor: const WidgetStatePropertyAll(Colors.white),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.danger,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
           ),
           child: child,
         );
@@ -109,13 +128,13 @@ class CustomButton extends StatelessWidget {
     if (fullWidth) {
       return SizedBox(
         width: double.infinity,
-        height: 48,
+        height: 52,
         child: button,
       );
     }
 
     return SizedBox(
-      height: 48,
+      height: 52,
       child: button,
     );
   }

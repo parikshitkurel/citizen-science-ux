@@ -18,6 +18,7 @@ class AppColors {
   static const Color inputBackground = Color(0xFFF8FAFC);
   static const Color lightTealSurface = Color(0xFFE0F3F0);
   static const Color lightBlueSurface = Color(0xFFE0F2FE);
+  static const Color divider = Color(0xFFE2E8F0);
 
   // Status & Feedback
   static const Color warning = Color(0xFFD97706);
@@ -27,4 +28,16 @@ class AppColors {
   static const Color info = Color(0xFF0284C7);
   static const Color danger = Color(0xFFDC2626);
   static const Color dangerSurface = Color(0xFFFEE2E2);
+}
+
+/// Consistent spacing scale used throughout the app.
+/// Based on a 4px base unit for Law of Proximity grouping.
+class AppSpacing {
+  static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 12;
+  static const double base = 16;
+  static const double lg = 24;
+  static const double xl = 32;
+  static const double xxl = 48;
 }

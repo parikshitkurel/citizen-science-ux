@@ -20,6 +20,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
   ObservationScopeFilter _scopeFilter = ObservationScopeFilter.all;
   String _selectedWaterBody = 'All';
+  bool _showWaterBodyFilter = false;
 
   @override
   void dispose() {
@@ -32,7 +33,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(isDemo ? 'Delete Demo Sample?' : 'Delete Observation?'),
         content: Text(
           isDemo
@@ -75,6 +76,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
       appBar: AppBar(
         title: const Text('Observation History'),
         actions: [
+          // Filter toggle
+          IconButton(
+            icon: Icon(
+              _showWaterBodyFilter ? Icons.filter_alt : Icons.filter_alt_outlined,
+              color: _showWaterBodyFilter || _selectedWaterBody != 'All'
+                  ? AppColors.primaryTeal
+                  : null,
+            ),
+            tooltip: 'Water Body Filter',
+            onPressed: () {
+              setState(() {
+                _showWaterBodyFilter = !_showWaterBodyFilter;
+                if (!_showWaterBodyFilter) {
+                  _selectedWaterBody = 'All';
+                }
+              });
+            },
+          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             tooltip: 'Manage Data',
@@ -228,18 +247,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 constraints: const BoxConstraints(maxWidth: 760),
                 child: Column(
                   children: [
-                    // Search Bar & Filter Controls
+                    // Search & Filter Controls — grouped together (Law of Proximity)
                     Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Search
                           TextField(
                             controller: _searchController,
                             onChanged: (_) => setState(() {}),
                             decoration: InputDecoration(
                               hintText:
-                                  'Search by title, location, or notes...',
+                                  'Search by title, location, or notes…',
                               prefixIcon: const Icon(Icons.search,
                                   color: AppColors.primaryTeal),
                               suffixIcon: _searchController.text.isNotEmpty
@@ -255,7 +275,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                           const SizedBox(height: 10),
 
-                          // Scope Filter (All / My Entries / Demo Samples)
+                          // Scope Filter — horizontally scrollable
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -267,20 +287,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   onSelected: () => setState(() =>
                                       _scopeFilter = ObservationScopeFilter.all),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 _buildScopeChip(
-                                  label:
-                                      'My Observations (${userObservations.length})',
-                                  icon: Icons.person_pin_outlined,
+                                  label: 'Mine (${userObservations.length})',
+                                  icon: Icons.person_outlined,
                                   isSelected: _scopeFilter ==
                                       ObservationScopeFilter.userOnly,
                                   onSelected: () => setState(() => _scopeFilter =
                                       ObservationScopeFilter.userOnly),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
                                 _buildScopeChip(
-                                  label:
-                                      'Demo Samples (${demoObservations.length})',
+                                  label: 'Demo (${demoObservations.length})',
                                   icon: Icons.science_outlined,
                                   isSelected: _scopeFilter ==
                                       ObservationScopeFilter.demoOnly,
@@ -290,44 +308,47 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 8),
 
-                          // Water Body Type Filter Chips
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                'All',
-                                ...AppConstants.waterBodyTypes
-                              ].map((filter) {
-                                final isSelected =
-                                    _selectedWaterBody == filter;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 6.0),
-                                  child: FilterChip(
-                                    label: Text(filter),
-                                    selected: isSelected,
-                                    selectedColor: AppColors.lightTealSurface,
-                                    checkmarkColor: AppColors.primaryTeal,
-                                    labelStyle: TextStyle(
-                                      color: isSelected
-                                          ? AppColors.darkTeal
-                                          : AppColors.textPrimary,
-                                      fontWeight: isSelected
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      fontSize: 12,
+                          // Water Body Type Filter — revealed on demand (progressive disclosure)
+                          if (_showWaterBodyFilter) ...[
+                            const SizedBox(height: 8),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  'All',
+                                  ...AppConstants.waterBodyTypes
+                                ].map((filter) {
+                                  final isSelected =
+                                      _selectedWaterBody == filter;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 6.0),
+                                    child: FilterChip(
+                                      label: Text(filter),
+                                      selected: isSelected,
+                                      selectedColor: AppColors.lightTealSurface,
+                                      checkmarkColor: AppColors.primaryTeal,
+                                      visualDensity: VisualDensity.compact,
+                                      labelStyle: TextStyle(
+                                        color: isSelected
+                                            ? AppColors.darkTeal
+                                            : AppColors.textPrimary,
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        fontSize: 12,
+                                      ),
+                                      onSelected: (selected) {
+                                        setState(() {
+                                          _selectedWaterBody = filter;
+                                        });
+                                      },
                                     ),
-                                    onSelected: (selected) {
-                                      setState(() {
-                                        _selectedWaterBody = filter;
-                                      });
-                                    },
-                                  ),
-                                );
-                              }).toList(),
+                                  );
+                                }).toList(),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),
@@ -335,13 +356,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     // Count summary bar
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 4.0),
+                          horizontal: 20.0, vertical: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Flexible(
                             child: Text(
-                              'Showing ${filtered.length} of ${scopedList.length} records',
+                              '${filtered.length} ${filtered.length == 1 ? 'record' : 'records'}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -349,15 +370,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '100% Offline',
-                            style: TextStyle(
-                              color: AppColors.primaryTeal,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -378,7 +390,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             )
                           : ListView.builder(
                               padding: const EdgeInsets.fromLTRB(
-                                  20.0, 6.0, 20.0, 80.0),
+                                  20.0, 0.0, 20.0, 80.0),
                               itemCount: filtered.length,
                               itemBuilder: (context, index) {
                                 final obs = filtered[index];
@@ -423,6 +435,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       label: Text(label),
       selected: isSelected,
       selectedColor: AppColors.lightTealSurface,
+      visualDensity: VisualDensity.compact,
       labelStyle: TextStyle(
         color: isSelected ? AppColors.darkTeal : AppColors.textPrimary,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -444,22 +457,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
     if (userEmpty) {
       title = 'No personal observations yet';
       subtitle =
-          'You haven\'t recorded any freshwater observations yet. Tap "Start Assessment" below to record your first stream check.';
+          'You haven\'t recorded any freshwater observations yet. Tap "Start New Assessment" below to record your first.';
       icon = Icons.person_pin_outlined;
     } else if (demoEmpty) {
       title = 'No demo samples loaded';
       subtitle =
-          'Demo observations are currently hidden. You can reload sample data anytime from the menu in the top right.';
+          'Demo observations are currently hidden. You can reload sample data from the menu.';
       icon = Icons.science_outlined;
     } else if (totalEmpty) {
       title = 'No observations saved';
       subtitle =
-          'Your local workspace is empty. Tap "Start Assessment" below or reload sample data from the menu.';
+          'Your local workspace is empty. Tap "Start New Assessment" below to begin.';
       icon = Icons.folder_open_outlined;
     } else {
       title = 'No matching observations';
       subtitle =
-          'Try clearing your search query or switching your scope and water body filters.';
+          'Try clearing your search or adjusting your filters.';
       icon = Icons.search_off_outlined;
     }
 
@@ -470,28 +483,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(16),
               decoration: const BoxDecoration(
                 color: AppColors.lightTealSurface,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                size: 44,
+                size: 40,
                 color: AppColors.primaryTeal,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.textPrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 17,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               subtitle,
               textAlign: TextAlign.center,

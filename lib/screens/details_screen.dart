@@ -55,7 +55,7 @@ ${AppConstants.observationDisclaimer}
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(isDemo ? 'Delete Demo Sample?' : 'Delete Observation?'),
         content: Text(
           isDemo
@@ -95,14 +95,32 @@ ${AppConstants.observationDisclaimer}
         title: const Text('Observation Details'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_outlined),
+            icon: const Icon(Icons.copy_outlined, size: 20),
             tooltip: 'Copy Summary',
             onPressed: () => _copySummaryToClipboard(context),
           ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: AppColors.danger),
-            tooltip: 'Delete',
-            onPressed: () => _confirmDelete(context),
+          // Delete visually separated — uses danger color but smaller icon
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'More Actions',
+            onSelected: (value) {
+              if (value == 'delete') {
+                _confirmDelete(context);
+              }
+            },
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
+                    SizedBox(width: 8),
+                    Text('Delete Observation',
+                        style: TextStyle(color: AppColors.danger)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -118,41 +136,32 @@ ${AppConstants.observationDisclaimer}
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header Banner Card
+                        // Header Banner
                         _buildHeaderBanner(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
 
-                        // Citizen science tag & non-lab disclaimer
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightTealSurface,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                                color: AppColors.primaryTeal.withOpacity(0.3)),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.verified_outlined,
-                                  color: AppColors.darkTeal, size: 18),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Citizen Science Record • Visual Estimate (Not Certified Laboratory Data)',
-                                  style: TextStyle(
-                                    color: AppColors.darkTeal,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                  ),
+                        // Citizen science notice — compact inline
+                        Row(
+                          children: [
+                            Icon(Icons.verified_outlined,
+                                color: AppColors.darkTeal, size: 16),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Citizen Science Record • Visual Estimate',
+                                style: TextStyle(
+                                  color: AppColors.darkTeal,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
 
                         // Section 1: Water Appearance Details
-                        _buildDetailCard(
+                        _buildDetailSection(
                           title: 'Water Appearance',
                           icon: Icons.water_drop_outlined,
                           items: [
@@ -165,10 +174,10 @@ ${AppConstants.observationDisclaimer}
                                 'Water Odour', observation.odour),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
 
                         // Section 2: Environmental Factors
-                        _buildDetailCard(
+                        _buildDetailSection(
                           title: 'Environmental Factors',
                           icon: Icons.eco_outlined,
                           items: [
@@ -184,19 +193,19 @@ ${AppConstants.observationDisclaimer}
                                 observation.surroundingEnvironment),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
 
                         // Section 3: Notes
-                        _buildDetailCard(
+                        _buildDetailSection(
                           title: 'Field Notes',
                           icon: Icons.notes_outlined,
                           items: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 4.0),
+                              padding: const EdgeInsets.only(top: 2.0),
                               child: Text(
                                 observation.notes.isNotEmpty
                                     ? observation.notes
-                                    : 'No additional field notes entered for this observation.',
+                                    : 'No additional field notes entered.',
                                 style: TextStyle(
                                   color: observation.notes.isNotEmpty
                                       ? AppColors.textPrimary
@@ -216,7 +225,7 @@ ${AppConstants.observationDisclaimer}
                   ),
                 ),
 
-                // Bottom CTA bar ("Make Another Observation")
+                // Bottom CTA
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: const BoxDecoration(
@@ -250,14 +259,15 @@ ${AppConstants.observationDisclaimer}
   Widget _buildHeaderBanner() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.primaryNavy,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Badges row
           Row(
             children: [
               StatusBadge.waterBody(observation.waterBodyType),
@@ -268,43 +278,46 @@ ${AppConstants.observationDisclaimer}
                 StatusBadge.userRecorded(),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
+          // Title
           Text(
             observation.title,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
+          // Location
           Row(
             children: [
               const Icon(Icons.location_on_outlined,
-                  color: AppColors.lightTealSurface, size: 16),
-              const SizedBox(width: 6),
+                  color: AppColors.lightTealSurface, size: 15),
+              const SizedBox(width: 5),
               Expanded(
                 child: Text(
                   observation.location,
                   style: const TextStyle(
                     color: AppColors.lightTealSurface,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 3),
+          // Date
           Row(
             children: [
-              const Icon(Icons.access_time, color: Colors.white60, size: 16),
-              const SizedBox(width: 6),
+              const Icon(Icons.access_time, color: Colors.white54, size: 15),
+              const SizedBox(width: 5),
               Text(
                 observation.formattedCreatedAt,
                 style: const TextStyle(
-                  color: Colors.white60,
-                  fontSize: 13,
+                  color: Colors.white54,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -314,17 +327,19 @@ ${AppConstants.observationDisclaimer}
     );
   }
 
-  Widget _buildDetailCard({
+  /// Detail section — uses divider + typography hierarchy instead of heavy card borders.
+  /// Consistent with Review screen structure (Law of Similarity).
+  Widget _buildDetailSection({
     required String title,
     required IconData icon,
     required List<Widget> items,
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -332,19 +347,22 @@ ${AppConstants.observationDisclaimer}
         children: [
           Row(
             children: [
-              Icon(icon, color: AppColors.primaryTeal, size: 20),
+              Icon(icon, color: AppColors.primaryTeal, size: 18),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
                 ),
               ),
             ],
           ),
-          const Divider(color: AppColors.border, height: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1, color: AppColors.border),
+          ),
           ...items,
         ],
       ),
@@ -353,13 +371,13 @@ ${AppConstants.observationDisclaimer}
 
   Widget _buildDetailItem(String label, String value, {Widget? widgetValue}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
           ),
           const SizedBox(width: 8),
           widgetValue ??
@@ -370,7 +388,7 @@ ${AppConstants.observationDisclaimer}
                   style: const TextStyle(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
-                    fontSize: 14,
+                    fontSize: 13,
                   ),
                 ),
               ),
