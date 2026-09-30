@@ -28,8 +28,8 @@ if ($LASTEXITCODE -eq 0) {
     $destinationApk = "$targetDir\AquaVerify_v$cleanVersion.apk"
 
     Copy-Item $sourceApk $destinationApk -Force
-    Write-Host "`n✔ APK successfully copied to: $destinationApk" -ForegroundColor Green
+    Write-Host "`n[SUCCESS] APK successfully copied to: $destinationApk" -ForegroundColor Green
     Get-ChildItem $targetDir | Format-Table Name, Length, LastWriteTime
 } else {
-    Write-Host "`n✖ Build failed. Check errors above." -ForegroundColor Red
+    Write-Host "`n[ERROR] Build failed. Check errors above." -ForegroundColor Red
 }
